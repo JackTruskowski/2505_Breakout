@@ -16,9 +16,23 @@ class BreakoutViewController: UIViewController, UIDynamicAnimatorDelegate {
         // Do any additional setup after loading the view, typically from a nib.
         animator.addBehavior(breakoutBehavior)
         resetSquares()
+        resetBall()
     }
     
     @IBOutlet weak var gameView: UIView!
+    
+    @IBAction func tapGesture(sender: UITapGestureRecognizer) {
+        
+        let degrees = Double(arc4random_uniform(360) + 1)
+        let radians = (M_PI/180)*degrees
+        
+        let instantaneousPush: UIPushBehavior = UIPushBehavior(items: [theBall!], mode: UIPushBehaviorMode.Instantaneous)
+        instantaneousPush.setAngle( CGFloat(radians) , magnitude: 0.025);
+        
+        animator.addBehavior(instantaneousPush)
+    }
+    
+    var theBall : UIView?
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
@@ -28,6 +42,11 @@ class BreakoutViewController: UIViewController, UIDynamicAnimatorDelegate {
     var brickSize : CGSize {
         let size = (gameView.frame.size.width / CGFloat(numColumns))
         return CGSize(width: size, height: size/2)
+    }
+    
+    var ballSize: CGSize {
+        let size = CGFloat(7)
+        return CGSize(width: size, height: size)
     }
     
     let breakoutBehavior = BreakoutBehavior()
@@ -54,6 +73,18 @@ class BreakoutViewController: UIViewController, UIDynamicAnimatorDelegate {
             }
         }
         
+    }
+    
+    //puts the ball above the paddle
+    func resetBall() {
+        let frame = CGRect(origin: CGPoint(x: gameView.frame.size.width/2, y: gameView.frame.size.height/2), size: ballSize)
+        
+        let ballView = UIView(frame: frame)
+        ballView.backgroundColor = UIColor.blueColor()
+        
+        breakoutBehavior.addBall(ballView)
+        
+        theBall = ballView
     }
     
     func getColorForRow(row: Int)-> UIColor {

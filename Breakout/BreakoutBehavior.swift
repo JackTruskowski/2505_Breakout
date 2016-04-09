@@ -18,9 +18,13 @@ class BreakoutBehavior : UIDynamicBehavior {
     
     lazy var ballBehavior: UIDynamicItemBehavior = {
         let lazyBallBehavior = UIDynamicItemBehavior()
-        lazyBallBehavior.elasticity = 0.75
+        lazyBallBehavior.elasticity = 1.0
+        lazyBallBehavior.friction = 0.0
+        lazyBallBehavior.resistance = 0.0
         return lazyBallBehavior
     }()
+    
+    
     
     override init() {
         super.init()
@@ -28,14 +32,18 @@ class BreakoutBehavior : UIDynamicBehavior {
         addChildBehavior(collider)
     }
     
+    func addBall(ball: UIView){
+        
+        dynamicAnimator?.referenceView?.addSubview(ball)
+        collider.addItem(ball)
+        ballBehavior.addItem(ball)
+    }
+    
     func addBrick(brick: UIView){
-        print("ADDING THE SUBVIEW")
         dynamicAnimator?.referenceView?.addSubview(brick)
-        //collider.addItem(brick)
     }
     
     func removeBrick(brick: UIView){
-        //collider.removeItem(brick)
         brick.removeFromSuperview()
     }
     
