@@ -66,10 +66,14 @@ class BreakoutViewController: UIViewController, UIDynamicAnimatorDelegate {
             for var i=0; i<numColumns; i++ {
                 let frame = CGRect(origin: CGPoint(x: CGFloat(i)*(brickSize.width), y:CGFloat(j)*brickSize.height), size: brickSize)
                 
+                let path = UIBezierPath(rect: frame)
+                let name = String(j) + String(i)
+                breakoutBehavior.addBarrier(path, named: name)
+                
                 let brickView = UIView(frame: frame)
                 brickView.backgroundColor = getColorForRow(j)
                 
-                breakoutBehavior.addBrick(brickView)
+                breakoutBehavior.addBrick(brickView, name: name)
             }
         }
         
