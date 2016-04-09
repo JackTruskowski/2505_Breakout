@@ -70,6 +70,14 @@ class BreakoutBehavior : UIDynamicBehavior, UICollisionBehaviorDelegate {
         ballBehavior.addItem(ball)
     }
     
+    func addPaddle(paddle: UIView){
+        dynamicAnimator?.referenceView?.addSubview(paddle)
+    }
+    
+    func removePaddle(paddle: UIView){
+        paddle.removeFromSuperview()
+    }
+    
     func addBrick(brick: UIView, name:String){
         
         let newBrick = brickStruct(identity: name, brick: brick)

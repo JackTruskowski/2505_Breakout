@@ -15,11 +15,40 @@ class BreakoutViewController: UIViewController, UIDynamicAnimatorDelegate {
         gameView.frame = (gameView.superview?.bounds)!;
         // Do any additional setup after loading the view, typically from a nib.
         animator.addBehavior(breakoutBehavior)
+        resetBallAndPaddle()
         resetSquares()
-        resetBall()
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
     }
     
     @IBOutlet weak var gameView: UIView!
+    
+    
+    @IBAction func panGesture(sender: UIPanGestureRecognizer) {
+        
+        let temp = sender.translationInView(self.gameView)
+        
+        var newDir = temp.x - prevPan
+        
+        
+        if(currentPaddleXPosition + newDir < 0 || currentPaddleXPosition + paddleSize.width + newDir > gameView.bounds.size.width){
+            newDir = 0
+            prevPan = 0
+        }
+        print(temp)
+        
+        movePaddleToXLoc(newDir)
+        
+        switch sender.state{
+        case .Ended:
+            prevPan = 0.0
+        default:
+            prevPan = temp.x
+        }
+        
+    }
     
     @IBAction func tapGesture(sender: UITapGestureRecognizer) {
         
@@ -33,6 +62,9 @@ class BreakoutViewController: UIViewController, UIDynamicAnimatorDelegate {
     }
     
     var theBall : UIView?
+    var thePaddle : UIView?
+    var currentPaddleXPosition : CGFloat = 0.0
+    var prevPan : CGFloat = 0.0
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
@@ -49,9 +81,14 @@ class BreakoutViewController: UIViewController, UIDynamicAnimatorDelegate {
         return CGSize(width: size, height: size)
     }
     
+    var paddleSize: CGSize {
+        return CGSize(width: 50.0, height: 8.0)
+    }
+    
     let breakoutBehavior = BreakoutBehavior()
     let numColumns = 8
     let numRows = 4
+    let paddleOffset = 5
     
     lazy var animator: UIDynamicAnimator = {
         let lazyAnimator = UIDynamicAnimator(referenceView: self.gameView)
@@ -79,16 +116,47 @@ class BreakoutViewController: UIViewController, UIDynamicAnimatorDelegate {
         
     }
     
+    func movePaddleToXLoc(newX: CGFloat){
+        
+        breakoutBehavior.removePaddle(thePaddle!)
+        
+        let frame = CGRect(origin: CGPoint(x: currentPaddleXPosition + newX, y: gameView.frame.size.height/2 + gameView.frame.size.height/3 + CGFloat(paddleOffset)), size: paddleSize)
+        let path = UIBezierPath(rect: frame)
+        let name = "paddle"
+        breakoutBehavior.addBarrier(path, named: name)
+        
+        thePaddle = UIView(frame: frame)
+        thePaddle!.backgroundColor = UIColor.blackColor()
+        
+        breakoutBehavior.addPaddle(thePaddle!)
+        
+        currentPaddleXPosition += newX
+    }
+    
+    
     //puts the ball above the paddle
-    func resetBall() {
-        let frame = CGRect(origin: CGPoint(x: gameView.frame.size.width/2, y: gameView.frame.size.height/2), size: ballSize)
+    func resetBallAndPaddle() {
+        let frame = CGRect(origin: CGPoint(x: gameView.frame.size.width/2 - ballSize.width/2, y: gameView.frame.size.height/2 + gameView.frame.size.height/3), size: ballSize)
         
-        let ballView = UIView(frame: frame)
-        ballView.backgroundColor = UIColor.blueColor()
+        var paddleFrame = frame
+        paddleFrame.size = paddleSize
+        paddleFrame.origin.x -= CGFloat(paddleSize.width/2 - ballSize.width/2)
+        paddleFrame.origin.y += CGFloat(paddleOffset)
+        currentPaddleXPosition = paddleFrame.origin.x
         
-        breakoutBehavior.addBall(ballView)
+        let path = UIBezierPath(rect: paddleFrame)
+        let name = "paddle"
+        breakoutBehavior.addBarrier(path, named: name)
+        currentPaddleXPosition = paddleFrame.origin.x
         
-        theBall = ballView
+        theBall = UIView(frame: frame)
+        theBall!.backgroundColor = UIColor.blueColor()
+        
+        thePaddle = UIView(frame: paddleFrame)
+        thePaddle!.backgroundColor = UIColor.blackColor()
+        
+        breakoutBehavior.addBall(theBall!)
+        breakoutBehavior.addPaddle(thePaddle!)
     }
     
     func getColorForRow(row: Int)-> UIColor {
