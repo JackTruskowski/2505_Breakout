@@ -126,7 +126,12 @@ class BreakoutBehavior : UIDynamicBehavior, UICollisionBehaviorDelegate {
     }
     
     func removeBrick(brick: UIView){
-        brick.removeFromSuperview()
+        
+        UIView.animateWithDuration(1.5, delay: 0.0, options: .CurveEaseOut, animations: {
+            brick.alpha = 0.0
+            }, completion: { finished in
+                brick.removeFromSuperview()
+        })
     }
     
 }
