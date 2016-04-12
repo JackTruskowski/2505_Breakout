@@ -10,6 +10,9 @@ import UIKit
 
 class BreakoutBehavior : UIDynamicBehavior, UICollisionBehaviorDelegate {
     
+    
+    var breakoutVC : BreakoutViewController?
+    
     lazy var collider: UICollisionBehavior = {
         let lazyCollider = UICollisionBehavior()
         lazyCollider.translatesReferenceBoundsIntoBoundary = true
@@ -24,6 +27,7 @@ class BreakoutBehavior : UIDynamicBehavior, UICollisionBehaviorDelegate {
         lazyBallBehavior.allowsRotation = false
         return lazyBallBehavior
     }()
+    
     
     struct brickStruct{
         var identity : String
@@ -50,7 +54,27 @@ class BreakoutBehavior : UIDynamicBehavior, UICollisionBehaviorDelegate {
                 removeBrick(namedFoo.brick)
                 removeBarrier(namedFoo.identity)
                 
+                for var i = 0; i < structArray.count; ++i {
+                    if(structArray[i].identity == namedFoo.identity){
+                        structArray.removeAtIndex(i)
+                        break
+                    }
+                }
+                
+                if structArray.count == 0 {
+                    breakoutVC?.resetGame()
+                }
+                
             }
+        }else{
+            
+            //wall boundary, check if the collision was with the bottom wall
+            if breakoutVC?.theBall?.center.y > breakoutVC?.thePaddle?.center.y {
+                //game over
+                breakoutVC?.resetGame()
+            }
+            
+            
         }
     }
     
@@ -64,10 +88,15 @@ class BreakoutBehavior : UIDynamicBehavior, UICollisionBehaviorDelegate {
     }
     
     func addBall(ball: UIView){
-        
         dynamicAnimator?.referenceView?.addSubview(ball)
         collider.addItem(ball)
         ballBehavior.addItem(ball)
+    }
+    
+    func removeBall(ball: UIView){
+        collider.removeItem(ball)
+        ballBehavior.removeItem(ball)
+        ball.removeFromSuperview()
     }
     
     func addPaddle(paddle: UIView){
@@ -84,6 +113,16 @@ class BreakoutBehavior : UIDynamicBehavior, UICollisionBehaviorDelegate {
         structArray.append(newBrick)
         
         dynamicAnimator?.referenceView?.addSubview(brick)
+    }
+    
+    func removeAllBricks(){
+        
+        for var i = 0; i < structArray.count; ++i {
+            structArray[i].brick.removeFromSuperview()
+        }
+        
+        structArray.removeAll()
+        
     }
     
     func removeBrick(brick: UIView){

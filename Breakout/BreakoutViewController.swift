@@ -14,9 +14,12 @@ class BreakoutViewController: UIViewController, UIDynamicAnimatorDelegate {
         super.viewDidLoad()
         gameView.frame = (gameView.superview?.bounds)!;
         // Do any additional setup after loading the view, typically from a nib.
-        animator.addBehavior(breakoutBehavior)
-        resetBallAndPaddle()
-        resetSquares()
+        
+        breakoutBehavior = BreakoutBehavior()
+        breakoutBehavior?.breakoutVC = self
+        animator.addBehavior(breakoutBehavior!)
+
+        resetGame()
     }
     
     override func viewDidLayoutSubviews() {
@@ -37,7 +40,6 @@ class BreakoutViewController: UIViewController, UIDynamicAnimatorDelegate {
             newDir = 0
             prevPan = 0
         }
-        print(temp)
         
         movePaddleToXLoc(newDir)
         
@@ -73,7 +75,7 @@ class BreakoutViewController: UIViewController, UIDynamicAnimatorDelegate {
     
     var brickSize : CGSize {
         let size = (gameView.frame.size.width / CGFloat(numColumns))
-        return CGSize(width: size, height: size/2)
+        return CGSize(width: size-brickOffset, height: gameView.bounds.height/20-brickOffset)
     }
     
     var ballSize: CGSize {
@@ -82,13 +84,15 @@ class BreakoutViewController: UIViewController, UIDynamicAnimatorDelegate {
     }
     
     var paddleSize: CGSize {
-        return CGSize(width: 50.0, height: 8.0)
+        return CGSize(width: gameView.bounds.width/7, height: 8.0)
     }
     
-    let breakoutBehavior = BreakoutBehavior()
+    var breakoutBehavior : BreakoutBehavior?
     let numColumns = 8
     let numRows = 4
     let paddleOffset = 5
+    let brickOffset : CGFloat = 2
+    
     
     lazy var animator: UIDynamicAnimator = {
         let lazyAnimator = UIDynamicAnimator(referenceView: self.gameView)
@@ -101,16 +105,16 @@ class BreakoutViewController: UIViewController, UIDynamicAnimatorDelegate {
         
         for var j=0; j<numRows; j++ {
             for var i=0; i<numColumns; i++ {
-                let frame = CGRect(origin: CGPoint(x: CGFloat(i)*(brickSize.width), y:CGFloat(j)*brickSize.height), size: brickSize)
+                let frame = CGRect(origin: CGPoint(x: CGFloat(i)*(brickSize.width)+(brickOffset*CGFloat(i)), y:CGFloat(j)*brickSize.height+(brickOffset*CGFloat(j))), size: brickSize)
                 
                 let path = UIBezierPath(rect: frame)
                 let name = String(j) + String(i)
-                breakoutBehavior.addBarrier(path, named: name)
+                breakoutBehavior!.addBarrier(path, named: name)
                 
                 let brickView = UIView(frame: frame)
                 brickView.backgroundColor = getColorForRow(j)
                 
-                breakoutBehavior.addBrick(brickView, name: name)
+                breakoutBehavior!.addBrick(brickView, name: name)
             }
         }
         
@@ -118,19 +122,27 @@ class BreakoutViewController: UIViewController, UIDynamicAnimatorDelegate {
     
     func movePaddleToXLoc(newX: CGFloat){
         
-        breakoutBehavior.removePaddle(thePaddle!)
+        breakoutBehavior!.removePaddle(thePaddle!)
         
         let frame = CGRect(origin: CGPoint(x: currentPaddleXPosition + newX, y: gameView.frame.size.height/2 + gameView.frame.size.height/3 + CGFloat(paddleOffset)), size: paddleSize)
         let path = UIBezierPath(rect: frame)
         let name = "paddle"
-        breakoutBehavior.addBarrier(path, named: name)
+        breakoutBehavior!.addBarrier(path, named: name)
         
         thePaddle = UIView(frame: frame)
         thePaddle!.backgroundColor = UIColor.blackColor()
         
-        breakoutBehavior.addPaddle(thePaddle!)
+        breakoutBehavior!.addPaddle(thePaddle!)
         
         currentPaddleXPosition += newX
+    }
+    
+    func resetGame(){
+        if(thePaddle != nil) {breakoutBehavior?.removePaddle(thePaddle!)}
+        if(theBall != nil) {breakoutBehavior?.removeBall(theBall!)}
+        breakoutBehavior?.removeAllBricks()
+        resetSquares()
+        resetBallAndPaddle()
     }
     
     
@@ -146,7 +158,7 @@ class BreakoutViewController: UIViewController, UIDynamicAnimatorDelegate {
         
         let path = UIBezierPath(rect: paddleFrame)
         let name = "paddle"
-        breakoutBehavior.addBarrier(path, named: name)
+        breakoutBehavior!.addBarrier(path, named: name)
         currentPaddleXPosition = paddleFrame.origin.x
         
         theBall = UIView(frame: frame)
@@ -155,8 +167,8 @@ class BreakoutViewController: UIViewController, UIDynamicAnimatorDelegate {
         thePaddle = UIView(frame: paddleFrame)
         thePaddle!.backgroundColor = UIColor.blackColor()
         
-        breakoutBehavior.addBall(theBall!)
-        breakoutBehavior.addPaddle(thePaddle!)
+        breakoutBehavior!.addBall(theBall!)
+        breakoutBehavior!.addPaddle(thePaddle!)
     }
     
     func getColorForRow(row: Int)-> UIColor {
