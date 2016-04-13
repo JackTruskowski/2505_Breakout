@@ -12,14 +12,19 @@ class BreakoutViewController: UIViewController, UIDynamicAnimatorDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        gameView.frame = (gameView.superview?.bounds)!;
-        // Do any additional setup after loading the view, typically from a nib.
+        
+        gameView.frame = (gameView.superview?.bounds)!
+        winLossMsg.hidden = true
         
         breakoutBehavior = BreakoutBehavior()
         breakoutBehavior?.breakoutVC = self
         animator.addBehavior(breakoutBehavior!)
+        currentLife = numLives
+        
+        updateLabelText()
 
         resetGame()
+        resetSquares()
     }
     
     override func viewDidLayoutSubviews() {
@@ -28,6 +33,9 @@ class BreakoutViewController: UIViewController, UIDynamicAnimatorDelegate {
     
     @IBOutlet weak var gameView: UIView!
     
+    @IBOutlet weak var livesLabel: UILabel!
+    
+    @IBOutlet weak var winLossMsg: UILabel!
     
     @IBAction func panGesture(sender: UIPanGestureRecognizer) {
         
@@ -61,12 +69,19 @@ class BreakoutViewController: UIViewController, UIDynamicAnimatorDelegate {
         instantaneousPush.setAngle( CGFloat(radians) , magnitude: 0.025);
         
         animator.addBehavior(instantaneousPush)
+        
+        winLossMsg.hidden = true
     }
     
+    
+    let labelText = "Lives: "
+    var currentLife : Int?
     var theBall : UIView?
     var thePaddle : UIView?
     var currentPaddleXPosition : CGFloat = 0.0
     var prevPan : CGFloat = 0.0
+    var breakoutBehavior : BreakoutBehavior?
+    
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
@@ -87,12 +102,18 @@ class BreakoutViewController: UIViewController, UIDynamicAnimatorDelegate {
         return CGSize(width: gameView.bounds.width/7, height: 8.0)
     }
     
-    var breakoutBehavior : BreakoutBehavior?
+    
+    //
+    //    CONSTANTS
+    //
     let numColumns = 8
     let numRows = 4
     let paddleOffset = 5
     let brickOffset : CGFloat = 2
-    
+    let numLives = 3
+    //
+    //
+    //
     
     lazy var animator: UIDynamicAnimator = {
         let lazyAnimator = UIDynamicAnimator(referenceView: self.gameView)
@@ -120,6 +141,10 @@ class BreakoutViewController: UIViewController, UIDynamicAnimatorDelegate {
         
     }
     
+    func updateLabelText(){
+        livesLabel.text = "\(labelText) \(currentLife!)"
+    }
+    
     func movePaddleToXLoc(newX: CGFloat){
         
         breakoutBehavior!.removePaddle(thePaddle!)
@@ -140,9 +165,12 @@ class BreakoutViewController: UIViewController, UIDynamicAnimatorDelegate {
     func resetGame(){
         if(thePaddle != nil) {breakoutBehavior?.removePaddle(thePaddle!)}
         if(theBall != nil) {breakoutBehavior?.removeBall(theBall!)}
+        resetBallAndPaddle()
+    }
+    
+    func resetBricks(){
         breakoutBehavior?.removeAllBricks()
         resetSquares()
-        resetBallAndPaddle()
     }
     
     
@@ -170,6 +198,17 @@ class BreakoutViewController: UIViewController, UIDynamicAnimatorDelegate {
         breakoutBehavior!.addBall(theBall!)
         breakoutBehavior!.addPaddle(thePaddle!)
     }
+    
+    
+    func updateAndShowWinLossLabel(won: Bool){
+        if(won){
+            winLossMsg.text = "You Won!"
+        }else{
+            winLossMsg.text = "You Lost!"
+        }
+        winLossMsg.hidden = false
+    }
+    
     
     func getColorForRow(row: Int)-> UIColor {
         switch row{

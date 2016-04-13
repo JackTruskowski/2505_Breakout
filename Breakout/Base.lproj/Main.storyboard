@@ -3,6 +3,7 @@
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="9530"/>
+        <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
     </dependencies>
     <scenes>
@@ -20,8 +21,38 @@
                         <subviews>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="y1d-xw-bwh">
                                 <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                                <subviews>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="urP-Fp-6qE">
+                                        <rect key="frame" x="8" y="556" width="584" height="36"/>
+                                        <accessibility key="accessibilityConfiguration">
+                                            <accessibilityTraits key="traits" staticText="YES" notEnabled="YES"/>
+                                        </accessibility>
+                                        <constraints>
+                                            <constraint firstAttribute="width" secondItem="urP-Fp-6qE" secondAttribute="height" multiplier="146:9" id="iEe-pR-kV8"/>
+                                        </constraints>
+                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wnB-w1-zZn">
+                                        <rect key="frame" x="278" y="290" width="44" height="20.5"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" secondItem="wnB-w1-zZn" secondAttribute="height" multiplier="62:29" id="TLO-Es-ofU"/>
+                                        </constraints>
+                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                </subviews>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <gestureRecognizers/>
+                                <constraints>
+                                    <constraint firstAttribute="trailing" secondItem="urP-Fp-6qE" secondAttribute="trailing" constant="8" id="H1z-Dc-0OW"/>
+                                    <constraint firstItem="wnB-w1-zZn" firstAttribute="centerX" secondItem="y1d-xw-bwh" secondAttribute="centerX" id="WuV-Z7-jUo"/>
+                                    <constraint firstAttribute="bottom" secondItem="urP-Fp-6qE" secondAttribute="bottom" constant="8" id="ekB-Sq-M8e"/>
+                                    <constraint firstItem="wnB-w1-zZn" firstAttribute="centerY" secondItem="y1d-xw-bwh" secondAttribute="centerY" id="kwv-ts-6sZ"/>
+                                    <constraint firstItem="urP-Fp-6qE" firstAttribute="leading" secondItem="y1d-xw-bwh" secondAttribute="leading" constant="8" id="xqX-TQ-FOA"/>
+                                </constraints>
                                 <connections>
                                     <outletCollection property="gestureRecognizers" destination="F9B-Uj-qfp" appends="YES" id="Hge-N5-4qw"/>
                                     <outletCollection property="gestureRecognizers" destination="xdB-Jx-DJw" appends="YES" id="4bL-7P-k9B"/>
@@ -38,6 +69,8 @@
                     </view>
                     <connections>
                         <outlet property="gameView" destination="y1d-xw-bwh" id="yIl-tf-cC5"/>
+                        <outlet property="livesLabel" destination="urP-Fp-6qE" id="2LL-sC-hR3"/>
+                        <outlet property="winLossMsg" destination="wnB-w1-zZn" id="fY4-gH-Y8G"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>

@@ -63,6 +63,11 @@ class BreakoutBehavior : UIDynamicBehavior, UICollisionBehaviorDelegate {
                 
                 if structArray.count == 0 {
                     breakoutVC?.resetGame()
+                    breakoutVC?.resetSquares()
+                    breakoutVC?.currentLife = breakoutVC?.numLives
+                    breakoutVC?.updateLabelText()
+                    
+                    breakoutVC?.updateAndShowWinLossLabel(true)
                 }
                 
             }
@@ -70,8 +75,19 @@ class BreakoutBehavior : UIDynamicBehavior, UICollisionBehaviorDelegate {
             
             //wall boundary, check if the collision was with the bottom wall
             if breakoutVC?.theBall?.center.y > breakoutVC?.thePaddle?.center.y {
-                //game over
-                breakoutVC?.resetGame()
+                
+                if breakoutVC?.currentLife > 0 {
+                    breakoutVC?.currentLife!--
+                    breakoutVC?.resetGame()
+                    breakoutVC?.updateLabelText()
+                }else{
+                    breakoutVC?.resetGame()
+                    breakoutVC?.resetSquares()
+                    breakoutVC?.currentLife! = (breakoutVC?.numLives)!
+                    breakoutVC?.updateLabelText()
+                    
+                    breakoutVC?.updateAndShowWinLossLabel(false)
+                }
             }
             
             
