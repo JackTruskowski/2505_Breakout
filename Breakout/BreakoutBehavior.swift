@@ -13,13 +13,13 @@ class BreakoutBehavior : UIDynamicBehavior, UICollisionBehaviorDelegate {
     
     var breakoutVC : BreakoutViewController?
     
-    lazy var collider: UICollisionBehavior = {
+    lazy var collider: UICollisionBehavior = { [unowned self] in
         let lazyCollider = UICollisionBehavior()
         lazyCollider.translatesReferenceBoundsIntoBoundary = true
         return lazyCollider
     }()
     
-    lazy var ballBehavior: UIDynamicItemBehavior = {
+    lazy var ballBehavior: UIDynamicItemBehavior = { [unowned self] in
         let lazyBallBehavior = UIDynamicItemBehavior()
         lazyBallBehavior.elasticity = 1.0
         lazyBallBehavior.friction = 0.0

@@ -39,23 +39,17 @@ class BreakoutViewController: UIViewController, UIDynamicAnimatorDelegate {
     
     @IBAction func panGesture(sender: UIPanGestureRecognizer) {
         
-        let temp = sender.translationInView(self.gameView)
-        
-        var newDir = temp.x - prevPan
-        
-        
-        if(currentPaddleXPosition + newDir < 0 || currentPaddleXPosition + paddleSize.width + newDir > gameView.bounds.size.width){
-            newDir = 0
-            prevPan = 0
+        if(sender.state == .Began){
+            originalPaddlePosition = (thePaddle?.center.x)!
         }
         
-        movePaddleToXLoc(newDir)
+        let temp = sender.translationInView(self.gameView).x
         
-        switch sender.state{
-        case .Ended:
-            prevPan = 0.0
-        default:
-            prevPan = temp.x
+        print(originalPaddlePosition + temp)
+        
+        
+        if(originalPaddlePosition + temp >= 0 && originalPaddlePosition + temp <= gameView.bounds.size.width){
+            movePaddleToXLoc(originalPaddlePosition+temp)
         }
         
     }
@@ -78,8 +72,7 @@ class BreakoutViewController: UIViewController, UIDynamicAnimatorDelegate {
     var currentLife : Int?
     var theBall : UIView?
     var thePaddle : UIView?
-    var currentPaddleXPosition : CGFloat = 0.0
-    var prevPan : CGFloat = 0.0
+    var originalPaddlePosition : CGFloat = 0.0
     var breakoutBehavior : BreakoutBehavior?
     
     
@@ -115,7 +108,7 @@ class BreakoutViewController: UIViewController, UIDynamicAnimatorDelegate {
     //
     //
     
-    lazy var animator: UIDynamicAnimator = {
+    lazy var animator: UIDynamicAnimator = { [unowned self] in
         let lazyAnimator = UIDynamicAnimator(referenceView: self.gameView)
         lazyAnimator.delegate = self
         return lazyAnimator
@@ -149,7 +142,7 @@ class BreakoutViewController: UIViewController, UIDynamicAnimatorDelegate {
         
         breakoutBehavior!.removePaddle(thePaddle!)
         
-        let frame = CGRect(origin: CGPoint(x: currentPaddleXPosition + newX, y: gameView.frame.size.height/2 + gameView.frame.size.height/3 + CGFloat(paddleOffset)), size: paddleSize)
+        let frame = CGRect(origin: CGPoint(x: newX, y: gameView.frame.size.height/2 + gameView.frame.size.height/3 + CGFloat(paddleOffset)), size: paddleSize)
         let path = UIBezierPath(rect: frame)
         let name = "paddle"
         breakoutBehavior!.addBarrier(path, named: name)
@@ -158,8 +151,6 @@ class BreakoutViewController: UIViewController, UIDynamicAnimatorDelegate {
         thePaddle!.backgroundColor = UIColor.blackColor()
         
         breakoutBehavior!.addPaddle(thePaddle!)
-        
-        currentPaddleXPosition += newX
     }
     
     func resetGame(){
@@ -182,12 +173,10 @@ class BreakoutViewController: UIViewController, UIDynamicAnimatorDelegate {
         paddleFrame.size = paddleSize
         paddleFrame.origin.x -= CGFloat(paddleSize.width/2 - ballSize.width/2)
         paddleFrame.origin.y += CGFloat(paddleOffset)
-        currentPaddleXPosition = paddleFrame.origin.x
         
         let path = UIBezierPath(rect: paddleFrame)
         let name = "paddle"
         breakoutBehavior!.addBarrier(path, named: name)
-        currentPaddleXPosition = paddleFrame.origin.x
         
         theBall = UIView(frame: frame)
         theBall!.backgroundColor = UIColor.blueColor()
